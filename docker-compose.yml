@@ -1,0 +1,15 @@
+pg:
+    image: postgres:latest
+    volumes:
+        - /var/lib/postgres
+    ports:
+        - 5432:5432
+    environment:
+        POSTGRES_DB: lireddit
+        POSTGRES_USER: lireddit
+        POSTGRES_PASSWORD: lireddit
+
+redis:
+    image: redis:latest
+    ports:
+        - 6379:6379
