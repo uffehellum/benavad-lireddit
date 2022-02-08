@@ -5,11 +5,13 @@ import {
   InputType,
   Mutation,
   ObjectType,
+  Query,
   Resolver,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { User } from "../entities/User";
 import argon2 from "argon2";
+import session from "express-session";
 
 @InputType()
 class UsernamePasswordInput {
@@ -38,10 +40,21 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, {nullable: true})
+  async me(
+    @Ctx() { em, req }: MyContext) {
+      const uid = req.session?.userId;
+      if (!uid) {
+        return null;
+      }
+      const user = await em.findOne(User, {id:uid});
+      return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     if (options.username.length < 3) {
       return {
@@ -90,13 +103,14 @@ export class UserResolver {
         ],
       };
     }
+    req.session!.userId = user.id;
     return { user };
   }
 
   @Mutation(() => UserResponse)
   async login(
     @Arg("options", () => UsernamePasswordInput) data: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const user = await em.findOne(User, {
       name: data.username,
@@ -105,11 +119,12 @@ export class UserResolver {
       return { errors: [{ field: "user", error: "Can't find user" }] };
     }
     const isMatch: boolean = await argon2.verify(user.password, data.password);
-    if (isMatch) {
-      return { user };
+    if (!isMatch) {
+      return {
+        errors: [{ field: "password", error: "Password does not match" }],
+      };
     }
-    return {
-      errors: [{ field: "password", error: "Password does not match" }],
-    };
+    req.session!.userId = user.id;
+    return { user };
   }
 }

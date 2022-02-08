@@ -10,6 +10,9 @@ pg:
         POSTGRES_PASSWORD: lireddit
 
 redis:
-    image: redis:latest
+    image: redis
+    restart: always
     ports:
-        - 6379:6379
+        - '6379:6379'
+    volumes: 
+      - cache:/data
