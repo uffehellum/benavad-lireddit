@@ -12,22 +12,28 @@ import { createClient } from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+import cors from 'cors';
 
 const main = async () => {
   const orm = await MikroORM.init(mikroConfig);
   await orm.getMigrator().up();
   const app = express();
   const RedisStore = connectRedis(session);
-  const redisClient = createClient({legacyMode: true}); 
+  const redisClient = createClient({ legacyMode: true });
   try {
     await redisClient.connect();
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 
+  app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true 
+  }));
+
   // session middleware is available to apollo be\cause it runs first
   app.use(
-    session({ 
+    session({
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // ten years
         httpOnly: true,
@@ -39,12 +45,13 @@ const main = async () => {
       saveUninitialized: false, // don't always create session
       secret: "keyboard cat", // TODO: secret from environment variable
       store: new RedisStore({
-        client: redisClient,
-        disableTouch: true, 
+        // TypeScript: client is incompatible with client so do a double cast
+        client: redisClient as unknown as connectRedis.Client,
+        disableTouch: true,
         disableTTL: true,
-      }), 
+      }),
     })
-  ); 
+  );
 
   const schema = await buildSchema({
     resolvers: [HelloResolver, PostResolver, UserResolver],
@@ -60,17 +67,13 @@ const main = async () => {
   await apolloServer.start();
 
   // apollo middleware uses session
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
   app.listen(4000, () => {
     console.log("ready");
   });
 };
 
 main().catch((err) => console.error("main error:", err));
-
-// docker run --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
-
-// docker-compose up
-// docker exec -it benavad-lireddit_pg_1 psql -U project -W project
-
-console.log("halløjsasa");

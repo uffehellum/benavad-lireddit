@@ -19,6 +19,7 @@ interface InputFieldProps {
   type?: string;
 }
 
+// see: https://www.nadershamma.dev/blog/2019/how-to-access-object-properties-dynamically-using-bracket-notation-in-typescript/
 function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
   return o[propertyName]; // o[propertyName] is of type T[K]
 }
