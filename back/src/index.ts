@@ -1,5 +1,5 @@
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { SESSION_COOKIE_NAME, __prod__ } from "./constants";
 import mikroConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
@@ -40,7 +40,7 @@ const main = async () => {
         sameSite: "lax",
         secure: __prod__,
       },
-      name: "qid", // session cookie name
+      name: SESSION_COOKIE_NAME,
       resave: false,
       saveUninitialized: false, // don't always create session
       secret: "keyboard cat", // TODO: secret from environment variable

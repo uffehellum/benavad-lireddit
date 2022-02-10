@@ -5,6 +5,7 @@ import { Wrapper } from "../components/Wrapper";
 import { InputField } from "../components/InputField";
 import { useLoginMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
+import { NavBar } from "../components/NavBar";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -17,17 +18,16 @@ const LoginPage = () => {
   const [, callMutate] = useLoginMutation();
   return (
     <Wrapper variant="small">
+      <NavBar />
       <form
         onSubmit={handleSubmit(async (values) => {
           const result = await callMutate(values);
           if (result.data?.login.errors) {
             result.data.login.errors.forEach(({ field, error, __typename }) => {
               setError(
-                field,
+                field as "username" | "password", // Appease TS
                 { message: error, type: __typename },
-                {
-                  shouldFocus: false,
-                }
+                { shouldFocus: false }
               );
             });
           }

@@ -1,13 +1,14 @@
 import { useForm } from "react-hook-form";
 import React from "react";
-import { Box, Button, FormErrorMessage, space } from "@chakra-ui/react";
+import { Box, Button, FormErrorMessage } from "@chakra-ui/react";
 import { Wrapper } from "../components/Wrapper";
 import { InputField } from "../components/InputField";
 import { useRegisterMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
+import { NavBar } from "../components/NavBar";
 
 const Register = () => {
-    const router = useRouter();
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -21,28 +22,27 @@ const Register = () => {
 
   return (
     <Wrapper variant="small">
+      <NavBar />
       <form
         onSubmit={handleSubmit(async (values) => {
           const result = await callMutate(values);
-          console.log('result', result);
+          console.log("result", result);
           if (result.data?.register.errors) {
             console.log("errors:", result.data.register.errors);
             result.data.register.errors.forEach(
               ({ field, error, __typename }) => {
                 console.log("setting ui error", field, error);
                 setError(
-                  field,
+                  field as "username" | "password", // Appease TS
                   { message: error, type: __typename },
-                  {
-                    shouldFocus: false,
-                  }
+                  { shouldFocus: false }
                 );
               }
             );
           }
           if (result.data?.register.user) {
-              console.log("success, user:", result.data?.register.user);
-              await router.push('/posts');
+            console.log("success, user:", result.data?.register.user);
+            await router.push("/posts");
           }
         })}
       >

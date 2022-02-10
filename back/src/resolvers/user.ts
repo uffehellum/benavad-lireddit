@@ -11,6 +11,7 @@ import {
 import { MyContext } from "../types";
 import { User } from "../entities/User";
 import argon2 from "argon2";
+import { SESSION_COOKIE_NAME } from "../constants";
 
 @InputType()
 class UsernamePasswordInput {
@@ -39,15 +40,29 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  @Query(() => User, {nullable: true})
-  async me(
-    @Ctx() { em, req }: MyContext) {
-      const uid = req.session?.userId;
-      if (!uid) {
-        return null;
-      }
-      const user = await em.findOne(User, {id:uid});
-      return user;
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { em, req }: MyContext) {
+    const uid = req.session?.userId;
+    if (!uid) {
+      return null;
+    }
+    const user = await em.findOne(User, { id: uid });
+    return user;
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext): Promise<boolean> {
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("logout", err);
+          resolve(false);
+        } else {
+          res.clearCookie(SESSION_COOKIE_NAME);
+          resolve(true);
+        }
+      })
+    );
   }
 
   @Mutation(() => UserResponse)
