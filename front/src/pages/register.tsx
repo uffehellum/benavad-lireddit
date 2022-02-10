@@ -1,29 +1,51 @@
 import { useForm } from "react-hook-form";
 import React from "react";
-import { Box, Button, space } from "@chakra-ui/react";
+import { Box, Button, FormErrorMessage, space } from "@chakra-ui/react";
 import { Wrapper } from "../components/Wrapper";
 import { InputField } from "../components/InputField";
 import { useRegisterMutation } from "../generated/graphql";
-
+import { useRouter } from "next/router";
 
 const Register = () => {
+    const router = useRouter();
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
+    setError,
   } = useForm({ defaultValues: { username: "", password: "" } });
   const [{ data, fetching, error: submitError }, callMutate] =
     useRegisterMutation();
-  console.log("fetching", fetching);
+  console.log("fetching, isSubmitting", fetching, isSubmitting);
   console.log("data", data);
-
-  async function onSubmit(values) {
-    return callMutate(values);
-  }
 
   return (
     <Wrapper variant="small">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={handleSubmit(async (values) => {
+          const result = await callMutate(values);
+          console.log('result', result);
+          if (result.data?.register.errors) {
+            console.log("errors:", result.data.register.errors);
+            result.data.register.errors.forEach(
+              ({ field, error, __typename }) => {
+                console.log("setting ui error", field, error);
+                setError(
+                  field,
+                  { message: error, type: __typename },
+                  {
+                    shouldFocus: false,
+                  }
+                );
+              }
+            );
+          }
+          if (result.data?.register.user) {
+              console.log("success, user:", result.data?.register.user);
+              await router.push('/posts');
+          }
+        })}
+      >
         <InputField
           errors={errors}
           label="Name"
@@ -46,18 +68,33 @@ const Register = () => {
           type="password"
         />
         <Box mt={4}>
+          {fetching && <div>Fetching</div>}
           {isSubmitting ? (
             <div>Submitting</div>
-          ) : data ? (
-            <pre>{JSON.stringify(data)}</pre>
-          ) : submitError ? (
-            <pre>{JSON.stringify(submitError)}</pre>
           ) : (
             <Button colorScheme="teal" isLoading={isSubmitting} type="submit">
               Register
             </Button>
           )}
+          {submitError && (
+            <FormErrorMessage>
+              submit error
+              <pre>{JSON.stringify(submitError, null, 2)}</pre>
+            </FormErrorMessage>
+          )}
+          {data?.register?.errors?.length && (
+            <div>
+              {" "}
+              register errors
+              <pre>{JSON.stringify(data?.register?.errors, null, 2)}</pre>
+            </div>
+          )}
         </Box>
+        {data?.register?.user && (
+          <Box>
+            <pre>{JSON.stringify(data?.register?.user, null, 2)}</pre>
+          </Box>
+        )}
       </form>
     </Wrapper>
   );

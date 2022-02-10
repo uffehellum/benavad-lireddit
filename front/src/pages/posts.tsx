@@ -1,10 +1,10 @@
 import { Posts } from "../components/Posts";
 import { Wrapper } from "../components/Wrapper";
 
- const PostPage = () => (
+ const PostsPage = () => (
  <Wrapper>
     <Posts />
 </Wrapper>    
  );
 
- export default PostPage;
+ export default PostsPage;

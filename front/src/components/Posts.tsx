@@ -1,18 +1,8 @@
-import { useQuery } from 'urql';
+import { usePostsQuery } from '../generated/graphql';
 
-const PostsQuery = `
-  query {
-    posts {
-      id
-      title
-    }
-  }
-`;
 
 export const Posts = () => {
-  const [result, reexecuteQuery] = useQuery({
-    query: PostsQuery,
-  });
+  const [result, reexecuteQuery] = usePostsQuery();
   console.log('result', result);
   const { data, fetching, error } = result;
   if (fetching) return <p>Loading...</p>;

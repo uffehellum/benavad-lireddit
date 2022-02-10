@@ -98,6 +98,14 @@ export type UsernamePasswordInput = {
   username: Scalars['String'];
 };
 
+export type LoginMutationVariables = Exact<{
+  username: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, name: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
+
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -106,7 +114,30 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null, user?: { __typename?: 'User', id: number, name: string } | null } };
 
+export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
 
+
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, title: string }> };
+
+
+export const LoginDocument = gql`
+    mutation login($username: String!, $password: String!) {
+  login(options: {username: $username, password: $password}) {
+    user {
+      id
+      name
+    }
+    errors {
+      field
+      error
+    }
+  }
+}
+    `;
+
+export function useLoginMutation() {
+  return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
 export const RegisterDocument = gql`
     mutation register($username: String!, $password: String!) {
   register(options: {username: $username, password: $password}) {
@@ -124,4 +155,16 @@ export const RegisterDocument = gql`
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const PostsDocument = gql`
+    query Posts {
+  posts {
+    id
+    title
+  }
+}
+    `;
+
+export function usePostsQuery(options?: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'>) {
+  return Urql.useQuery<PostsQuery>({ query: PostsDocument, ...options });
 };
