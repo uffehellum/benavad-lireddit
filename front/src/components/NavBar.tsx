@@ -6,15 +6,23 @@ import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 interface NavBarProps {}
 export const NavBar: React.FC<NavBarProps> = ({}) => {
   const [{ data, fetching }] = useMeQuery();
-  const [, logout] = useLogoutMutation();
+  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   let body = null;
   if (fetching) {
     body = <div>Loading</div>;
   } else if (data?.me) {
     body = (
       <>
-        <Button onClick={() => logout()}>Logout {data.me.name}</Button>
         <NextLink href="/posts">Posts</NextLink>
+        <Button
+          variant="link"
+          isLoading={logoutFetching}
+          onClick={async () => {
+            await logout();
+          }}
+        >
+          Logout {data.me.name}
+        </Button>
       </>
     );
   } else {
@@ -29,9 +37,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   }
   return (
     <Flex bg="tan" p={4}>
-      <Box ml="auto">
-        {body}
-      </Box>
+      <Box ml="auto">{body}</Box>
     </Flex>
   );
 };

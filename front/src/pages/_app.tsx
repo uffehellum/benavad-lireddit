@@ -46,12 +46,7 @@ const client = createClient({
               cache,
               { query: MeDocument },
               result,
-              (res, _query) => {
-                if (res.logout) {
-                  return { me: null };
-                }
-                return { me: null };
-              }
+              () => ({ me: null })
             );
           },
           register: (result, _args, cache, _info) => {
