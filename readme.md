@@ -4,6 +4,7 @@ https://www.youtube.com/watch?v=I6ypD7qv3Z8&list=WL&index=135
 
 
 [Running the app]
+
     docker-compose up -d
 
     docker-compose down

@@ -6,6 +6,8 @@ import { InputField } from "../components/InputField";
 import { useLoginMutation } from "../generated/graphql";
 import { useRouter } from "next/router";
 import { NavBar } from "../components/NavBar";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { withUrqlClient } from "next-urql";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -69,4 +71,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default withUrqlClient(createUrqlClient)(LoginPage);

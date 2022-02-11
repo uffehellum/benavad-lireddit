@@ -1,6 +1,8 @@
+import { withUrqlClient } from "next-urql";
 import { NavBar } from "../components/NavBar";
 import { Posts } from "../components/Posts";
 import { Wrapper } from "../components/Wrapper";
+import { createUrqlClient } from "../utils/createUrqlClient";
 
 const PostsPage = () => (
   <Wrapper>
@@ -9,4 +11,4 @@ const PostsPage = () => (
   </Wrapper>
 );
 
-export default PostsPage;
+export default withUrqlClient(createUrqlClient)(PostsPage);
