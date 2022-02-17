@@ -8,28 +8,37 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
-import { createClient } from "redis";
+import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
-import cors from 'cors';
+import cors from "cors";
+import { sendEmail } from "./utils/sendEmail";
 
 const main = async () => {
+  await sendEmail(
+    "hellum.uffe@gmail.com",
+    "reset password",
+    "Confirm theis code to reset: 123456"
+  );
   const orm = await MikroORM.init(mikroConfig);
   await orm.getMigrator().up();
   const app = express();
   const RedisStore = connectRedis(session);
-  const redisClient = createClient({ legacyMode: true });
-  try {
-    await redisClient.connect();
-  } catch (e) {
-    console.error(e);
-  }
+  const redis = new Redis();
 
-  app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true 
-  }));
+  // try {
+  //   await redisClient.connect();
+  // } catch (e) {
+  //   console.error(e);
+  // }
+
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
 
   // session middleware is available to apollo be\cause it runs first
   app.use(
@@ -46,7 +55,7 @@ const main = async () => {
       secret: "keyboard cat", // TODO: secret from environment variable
       store: new RedisStore({
         // TypeScript: client is incompatible with client so do a double cast
-        client: redisClient as unknown as connectRedis.Client,
+        client: redis, // as unknown as connectRedis.Client,
         disableTouch: true,
         disableTTL: true,
       }),
@@ -60,7 +69,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: schema,
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
 

@@ -10,8 +10,10 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   let body = null;
   if (fetching) {
+    console.log('fetching me');
     body = <div>Loading</div>;
   } else if (data?.me) {
+    console.log('me', data);
     body = (
       <>
         <NextLink href="/">Root</NextLink>
@@ -20,6 +22,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
           variant="link"
           isLoading={logoutFetching}
           onClick={async () => {
+            console.log('logout');
             await logout();
           }}
         >

@@ -29,6 +29,8 @@ https://www.youtube.com/watch?v=I6ypD7qv3Z8&list=WL&index=135
 - ApolloServer for GraphQL schema
 - Redis for storing user session
 - QID cookie with session id
+- http://nodemailer.com
+
 
 [Web UI]
 - NextJS for react app with pages as routes

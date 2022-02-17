@@ -16,7 +16,7 @@ const Register = () => {
     register,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm({ defaultValues: { username: "", password: "" } });
+  } = useForm({ defaultValues: { email: "", username: "", password: "" } });
   const [{ data, fetching, error: submitError }, callMutate] =
     useRegisterMutation();
   console.log("fetching, isSubmitting", fetching, isSubmitting);
@@ -48,16 +48,25 @@ const Register = () => {
           }
         })}
       >
-        <InputField
-          errors={errors}
-          label="Name"
-          name="username"
-          placeholder="username"
-          register={register("username", {
-            required: "This is required",
-            minLength: { value: 3, message: "Minimum length should be 3" },
-          })}
-        />
+      <InputField
+        errors={errors}
+        label="Email"
+        name="email"
+        placeholder="email"
+        register={register("email", {
+          required: "This is required",
+        })}
+      />
+      <InputField
+        errors={errors}
+        label="Name"
+        name="username"
+        placeholder="username"
+        register={register("username", {
+          required: "This is required",
+          minLength: { value: 3, message: "Minimum length should be 3" },
+        })}
+      />
         <InputField
           errors={errors}
           label="Password"
