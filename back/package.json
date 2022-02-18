@@ -26,10 +26,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@mikro-orm/cli": "^4.5.10",
-    "@mikro-orm/core": "^4.5.10",
-    "@mikro-orm/migrations": "^4.5.10",
-    "@mikro-orm/postgresql": "^4.5.10",
     "apollo-server-express": "^3.6.2",
     "argon2": "^0.28.4",
     "connect-redis": "^6.1.1",
@@ -41,6 +37,7 @@
     "nodemailer": "^6.7.2",
     "pg": "^8.7.3",
     "type-graphql": "^1.1.1",
+    "typeorm": "^0.2.43",
     "uuid": "^8.3.2"
   },
   "mikro-orm": {

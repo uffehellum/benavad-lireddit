@@ -15,15 +15,16 @@ export function createUrqlClient(ssrExchange: any) {
     exchanges: [
       dedupExchange,
       cacheExchange({
+        
         updates: {
           Mutation: {
             changePassword: (_result, _args, cache, _info) => {
               console.log('clearing me');
-              cache.invalidate("me");
+              cache.invalidate("User");
             },
             login: (_result, _args, cache, _info) => {
               console.log('clearing me');
-              cache.invalidate("me");
+              cache.invalidate("User");
               // betterUpdateQuery<LoginMutation, MeQuery>(
               //   cache,
               //   { query: MeDocument },
@@ -40,7 +41,7 @@ export function createUrqlClient(ssrExchange: any) {
             },
             logout: (_result, _args, cache, _info) => {
               console.log('logout clearing me');
-              cache.invalidate("me");
+              cache.invalidate("User");
               // betterUpdateQuery<LogoutMutation, MeQuery>(
               //   cache,
               //   { query: MeDocument },
@@ -50,7 +51,7 @@ export function createUrqlClient(ssrExchange: any) {
             },
             Logout: (_result, _args, cache, _info) => {
               console.log('Logout clearing me');
-              cache.invalidate("me");
+              cache.invalidate("User");
               // betterUpdateQuery<LogoutMutation, MeQuery>(
               //   cache,
               //   { query: MeDocument },
@@ -60,7 +61,7 @@ export function createUrqlClient(ssrExchange: any) {
             },
             register: (_result, _args, cache, _info) => {
               console.log('register clearing me');
-              cache.invalidate("me");
+              cache.invalidate("User");
               // betterUpdateQuery<RegisterMutation, MeQuery>(
               //   cache,
               //   { query: MeDocument },

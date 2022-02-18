@@ -1,6 +1,5 @@
-import { MikroORM } from "@mikro-orm/core";
+import "reflect-metadata";
 import { SESSION_COOKIE_NAME, __prod__ } from "./constants";
-import mikroConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
@@ -13,25 +12,25 @@ import session from "express-session";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
-import { sendEmail } from "./utils/sendEmail";
+import { ConnectionOptions, createConnection } from "typeorm";
+import { User } from "./entities/User";
+import { Post } from "./entities/Post";
 
 const main = async () => {
-  await sendEmail(
-    "hellum.uffe@gmail.com",
-    "reset password",
-    "Confirm theis code to reset: 123456"
-  );
-  const orm = await MikroORM.init(mikroConfig);
-  await orm.getMigrator().up();
+  const options: ConnectionOptions = {
+    type: "postgres",  
+    database: "lireddit2",
+    username: "lireddit",
+    password: "lireddit",
+    logging: true,
+    synchronize: true,
+    entities: [User, Post]
+  };
+  const conn = await createConnection(options);
+  // conn.runMigrations();
   const app = express();
   const RedisStore = connectRedis(session);
   const redis = new Redis();
-
-  // try {
-  //   await redisClient.connect();
-  // } catch (e) {
-  //   console.error(e);
-  // }
 
   app.use(
     cors({
@@ -54,8 +53,7 @@ const main = async () => {
       saveUninitialized: false, // don't always create session
       secret: "keyboard cat", // TODO: secret from environment variable
       store: new RedisStore({
-        // TypeScript: client is incompatible with client so do a double cast
-        client: redis, // as unknown as connectRedis.Client,
+        client: redis,
         disableTouch: true,
         disableTTL: true,
       }),
@@ -69,7 +67,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: schema,
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res, redis }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
 

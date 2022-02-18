@@ -31,6 +31,10 @@ https://www.youtube.com/watch?v=I6ypD7qv3Z8&list=WL&index=135
 - QID cookie with session id
 - http://nodemailer.com
 
+--- kill mikro-orm and add typeorm
+- yarn add typeorm
+
+
 
 [Web UI]
 - NextJS for react app with pages as routes
@@ -57,3 +61,7 @@ front end typescript generation for graphql
 
 yarn add -D @graphql-codegen/cli
 yarn add -D @graphql-codegen/typescript-urql
+
+[database]
+docker exec -it benavad-lireddit_pg_1 bash
+> createdb -U lireddit lireddit2
