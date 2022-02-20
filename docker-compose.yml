@@ -5,7 +5,7 @@ pg:
     ports:
         - 5432:5432
     environment:
-        POSTGRES_DB: lireddit
+        POSTGRES_DB: lireddit2
         POSTGRES_USER: lireddit
         POSTGRES_PASSWORD: lireddit
 

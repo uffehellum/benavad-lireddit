@@ -19,7 +19,7 @@ import {
 import { FieldError } from "./FieldError";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
-import { getConnection } from "typeorm";
+// import { getConnection } from "typeorm";
 
 @InputType()
 class UsernamePasswordInput {

@@ -27,6 +27,7 @@ const main = async () => {
     entities: [User, Post]
   };
   const conn = await createConnection(options);
+  console.log("conn", conn.options);
   // conn.runMigrations();
   const app = express();
   const RedisStore = connectRedis(session);
@@ -38,7 +39,7 @@ const main = async () => {
       credentials: true,
     })
   );
-
+ 
   // session middleware is available to apollo be\cause it runs first
   app.use(
     session({
